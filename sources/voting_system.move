@@ -3,6 +3,8 @@ module decentralized_voting::voting_system {
     use sui::event;
     use sui::tx_context::sender;
     use sui::object::new;
+    use std::debug::print;
+
 
     // Error Codes
     // Defining constants for different error cases to handle exceptions in the contract
@@ -52,7 +54,7 @@ module decentralized_voting::voting_system {
         name: String,                        // Candidate's name
     }
 
-    // VoteCount struct to keep track of each candidate's vote count in an election
+    // VoteCount struct to keep track of each candidate's "vote" count in an election
     public struct VoteCount has store {
         candidate_id: u64,                   // Candidate ID associated with the vote count
         count: u64,                          // Number of votes received by the candidate
@@ -146,12 +148,12 @@ module decentralized_voting::voting_system {
     }
 
     // Register a new voter in the system
-    public fun register_voter(voting_system: &mut VotingSystem, _voter_address: address, voter_details: String, ctx: &mut TxContext) {
+    public fun register_voter(voting_system: &mut VotingSystem, voter_details: String, ctx: &mut TxContext) {
         let id = new(ctx);                    // Create unique ID for voter
         let vote_history = vector::empty();   // Initialize empty vote history
         let voter = Voter {
             id,
-            address: _voter_address,
+            address: ctx.sender(),
             details: voter_details,
             has_voted: false,
             vote_history,
@@ -213,6 +215,7 @@ module decentralized_voting::voting_system {
 
         let election_index = find_election_index(&voting_system.elections, election_id);
         let election = vector::borrow_mut(&mut voting_system.elections, election_index);
+        print(election);
         assert!(election.state == ELECTION_STATE_ONGOING, EInvalidElectionState); // Ensure election is ongoing
 
         let _candidate_index = find_candidate_index(&election.candidates, candidate_id);

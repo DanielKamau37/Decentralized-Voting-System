@@ -1,4 +1,4 @@
-module decentralized_voting::System {
+module decentralized_voting::voting_system {
     use std::string::String;
     use sui::event;
     use sui::tx_context::sender;
